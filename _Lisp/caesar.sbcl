@@ -20,6 +20,11 @@
 
 (defvar *isDecrypt* nil)
 (defvar *shift*     0)
+(defconstant *PRINTABLERANGE* 94)
+(defconstant *UPPERLIMIT* 127)
+(defconstant *LOWERLIMIT* 31)
+(defconstant *LASTPRINTABLE* 126)
+(defconstant *FIRSTPRINTABLE* 32)
 
 ( defun getParams ()
   (let ( (idx 1) )
@@ -49,7 +54,7 @@
                            (sb-ext:exit :abort t)
                         )
                      )
-                     (setf *shift* (MOD num 94))
+                     (setf *shift* (MOD num *PRINTABLERANGE*))
                  )
               )
            )
@@ -72,23 +77,26 @@
 
 ( loop for chr = (read-byte *standard-input* nil)
       while chr do 
-        ( if *isDecrypt*
-             ( format T "~C" 
-                  ( code-char 
-                         ( if ( > (- chr *shift*) 31 ) 
-                             (- chr *shift*) 
-                             (- 127 (- 32 (- chr *shift*) ) ) 
-                         ) 
-                  ) 
-             )
-             ( format T "~C" 
-                  ( code-char  
-                         ( if ( < (+ chr *shift*) 127 ) 
-                             (+ chr *shift*) 
-                             (+ 31 (- (+ chr *shift*) 126 ) ) 
-                         )   
-                  ) 
-             )
+        ( if ( and (> chr *LOWERLIMIT* ) (< chr *UPPERLIMIT* ) )
+            ( if *isDecrypt*
+                 ( format T "~C" 
+                      ( code-char 
+                                 ( if ( > (- chr *shift*) *LOWERLIMIT* ) 
+                                     (- chr *shift*) 
+                                     (- *UPPERLIMIT* (- *FIRSTPRINTABLE* (- chr *shift*) ) ) 
+                                 ) 
+                             )
+                 )
+                 ( format T "~C" 
+                      ( code-char  
+                             ( if ( < (+ chr *shift*) *UPPERLIMIT* ) 
+                                 (+ chr *shift*) 
+                                 (+ *LOWERLIMIT* (- (+ chr *shift*) *LASTPRINTABLE* ) ) 
+                             )   
+                      ) 
+                 )
+            )
+            ()
         )
 )
 
