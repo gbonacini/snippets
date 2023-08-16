@@ -1,0 +1,97 @@
+#!/usr/bin/sbcl  --script
+
+;; -----------------------------------------------------------------
+;; caesar.sbcl - a script to encrypt text using Caesar algorithm
+;; Copyright (C) 2023  Gabriele Bonacini
+;;
+;; This program is free software for no profit use; you can redistribute 
+;; it and/or modify it under the terms of the GNU General Public License 
+;; as published by the Free Software Foundation; either version 2 of 
+;; the License, or (at your option) any later version.
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;; You should have received a copy of the GNU General Public License
+;; along with this program; if not, write to the Free Software Foundation,
+;; Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
+;; A commercial license is also available for a lucrative use.
+;; -----------------------------------------------------------------
+
+(defvar *isDecrypt* nil)
+(defvar *shift*     0)
+
+( defun getParams ()
+  (let ( (idx 1) )
+     ( loop for arg = (nth idx sb-ext:*posix-argv*) 
+        while arg do  
+           (if (string-equal arg "-h") 
+              (progn
+                 (format T "caesar.sbcl [-s positions] |~%            ~
+                            [-d] [-s positions] |~%            ~
+                            [-h]~%[-h]       print this help message~%[-d]       ~
+                            decrypt~%[-s pos]   shift 'pos' positions in the alphabet~%~
+                            ~%This program crypt text passed in pipe using Caesar alghorithm.~%~%~
+                            Example:~%    ~
+                            echo 'message' | ./caesar.sbcl -s 10~%~%~
+                            Space is required between -s and its value.~%" )
+                 (sb-ext:exit :abort t)
+              )
+           )
+           (if (string-equal arg "-d") ( setf *isDecrypt* t ))
+           (if (string-equal arg "-s") 
+              (progn
+                 (incf idx)
+                 (let (( num (ignore-errors ( parse-integer (nth idx sb-ext:*posix-argv*)))))
+                     (if (not num)
+                        (progn
+                           ( format T "Wrong -s value~%" )
+                           (sb-ext:exit :abort t)
+                        )
+                     )
+                     (setf *shift* (MOD num 94))
+                 )
+              )
+           )
+           (incf idx)
+     )
+     ( if(= *shift* 0) 
+           (progn
+              ( format T "Missing mandatory argument [-s positions]~%" )
+              (sb-ext:exit :abort t)
+           )
+     )
+  )
+)
+
+;;
+;; main
+;; 
+
+(getParams)
+
+( loop for chr = (read-byte *standard-input* nil)
+      while chr do 
+        ( if ( and (> chr 31 ) (< chr 127 ) )
+            ( if *isDecrypt*
+                 ( format T "~C" 
+                      ( code-char 
+                                 ( if ( > (- chr *shift*) 31 ) 
+                                     (- chr *shift*) 
+                                     (- 127 (- 32 (- chr *shift*) ) ) 
+                                 ) 
+                             )
+                 )
+                 ( format T "~C" 
+                      ( code-char  
+                             ( if ( < (+ chr *shift*) 127 ) 
+                                 (+ chr *shift*) 
+                                 (+ 31 (- (+ chr *shift*) 126 ) ) 
+                             )   
+                      ) 
+                 )
+            )
+            ()
+        )
+)
+
