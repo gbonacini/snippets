@@ -196,5 +196,5 @@ Rebooting                                          OKAY [  0.004s]
   adb shell
   root@openstick:/# 
 ```
-
+* Uname:
 ![alt text](./images/uname.png "uname")
