@@ -31,7 +31,7 @@ Howto Install Debian on Tianjin USB 4G Modem
 ```shell
    12e698e	fastboot
 ```
-* From https://github.com/OpenStick/OpenStick/releases , download the following 2 files:
+* From https://github.com/OpenStick/OpenStick/releases , download the following 2 files (Ver. 1):
 ```shell
   debian.zip
   base-generic.zip
