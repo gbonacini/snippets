@@ -1,6 +1,8 @@
 Howto Install Debian on Tianjin USB 4G Modem
 ============================================
 
+![alt text](./images/modem4g.png "Modem image")
+
 * On a Linux PC, install following dependencies:
 ```shell
   apt install android-tools-adb android-tools-fastboot 
