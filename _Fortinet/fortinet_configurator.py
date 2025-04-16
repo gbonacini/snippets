@@ -60,7 +60,7 @@ def getParams():
 
 def getCertificateSha256():
 	global certificateSha246
-	sslCmd = "echo | openssl s_client -connect " + ip + ":" + port + " 2>/dev/null | openssl x509 -outform der | sha256sum"
+	sslCmd = "echo | openssl s_client -connect {}:{} 2>/dev/null | openssl x509 -outform der | sha256sum".format(ip, port)
 	try:
 		ostream = os.popen(sslCmd)
 		certificateSha246 = ostream.read()
